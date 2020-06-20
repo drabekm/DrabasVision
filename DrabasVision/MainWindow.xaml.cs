@@ -62,22 +62,42 @@ namespace DrabasVision
                 ddlDevices.Items.Add(deviceName);
             }
             ddlDevices.SelectedIndex = 0;
-        }
-
-        private void webcamNewFrameEventHandler(object sender, NewFrameEventArgs e)
-        {
-            
+            LoadDeviceResolutions(ddlDevices.SelectedIndex);
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            CurrentCamera = new Camera(ddlDevices.SelectedIndex, imgCameraPreview);
+            CurrentCamera = new Camera(ddlDevices.SelectedIndex, ddlDeviceResolutions.SelectedIndex, (int)sldThreshold.Value, imgCameraPreview);
+            ddlDevices.IsEnabled = false;
+            ddlDeviceResolutions.IsEnabled = false;
             CurrentCamera.Start();
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             CurrentCamera.Stop();
+            ddlDevices.IsEnabled = true;
+            ddlDeviceResolutions.IsEnabled = true;
+        }
+
+        private void LoadDeviceResolutions(int deviceIndex)
+        {
+            ddlDeviceResolutions.Items.Clear();
+            foreach (var resolution in Camera.GetDeviceResolutions(deviceIndex))
+            {
+                ddlDeviceResolutions.Items.Add(resolution);
+            }
+            ddlDeviceResolutions.SelectedIndex = 0;
+        }
+
+        private void ddlDevices_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            LoadDeviceResolutions(ddlDevices.SelectedIndex);
+        }
+
+        private void sldThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            CurrentCamera.SetThreshold((int)sldThreshold.Value);
         }
     }
 }

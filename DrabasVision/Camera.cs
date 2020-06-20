@@ -32,20 +32,31 @@ namespace DrabasVision
     {
         private VideoCaptureDevice CurrentDevice { get; set; }
         private string CurrentDeviceName { get; set; }
-        WriteableBitmap wb { get; set; }
+        private Analyzer analyzer;
+
+        private int Threshold { get; set; }
+
         System.Windows.Controls.Image outputControl;
 
-        public Camera(int cameraIndex, System.Windows.Controls.Image outputControl)
+        public Camera(int cameraIndex, int resolutionIndex, int threshold, System.Windows.Controls.Image outputControl)
         {
             try
             {
                 this.outputControl = outputControl;
+                this.Threshold = threshold;
 
                 FilterInfoCollection devices = GetDeviceCollection();
                 FilterInfo device = devices[cameraIndex];
 
                 CurrentDeviceName = device.Name;
                 CurrentDevice = new VideoCaptureDevice(device.MonikerString);
+                CurrentDevice.VideoResolution = CurrentDevice.VideoCapabilities[resolutionIndex];
+              /*  foreach(var capability in CurrentDevice.VideoCapabilities)
+                {
+                    MessageBox.Show(capability.FrameSize.Width + " " + capability.FrameSize.Height);
+                }*/
+
+                analyzer = new Analyzer();
             }
             catch
             {
@@ -53,6 +64,11 @@ namespace DrabasVision
                 CurrentDevice = null;
                 MessageBox.Show("Error initializing camera instance.", "Error", MessageBoxButton.OK);
             }
+        }
+
+        public void SetThreshold(int value)
+        {
+            this.Threshold = value;
         }
 
         public void Start()
@@ -73,19 +89,34 @@ namespace DrabasVision
 
         private void CameraNewFrameEventHandler(object sender, NewFrameEventArgs e)
         {
-            var blackAndWhitedWinformsBitmap = GetGrayScaleFrameImage(e);
+            var grayScaleWinformsBitmap = GetGrayScaleFrameImage(e);
+            var blackAndWhitedWinformsBitmap = GetBlackAndWhiteBitmap(grayScaleWinformsBitmap, out grayScaleWinformsBitmap);
 
-            BitmapImage grayScaledWriteableBitmap = BitmapHelper.ConvertWinformBitmapToWPFBitmap(blackAndWhitedWinformsBitmap);
-            SendFrameToUI(grayScaledWriteableBitmap);
+            var test = analyzer.Analyse(blackAndWhitedWinformsBitmap, grayScaleWinformsBitmap);
+            BitmapImage analysedWPFBitmap = BitmapHelper.ConvertWinformBitmapToWPFBitmap(test);
+
+            SendFrameToUI(analysedWPFBitmap);
         }
 
         private Bitmap GetGrayScaleFrameImage(NewFrameEventArgs e)
         {
             Bitmap winformsBitmap = (Bitmap)e.Frame.Clone();
-            Threshold filter = new Threshold(100);
+            
             winformsBitmap = Grayscale.CommonAlgorithms.BT709.Apply(winformsBitmap);
-            filter.ApplyInPlace(winformsBitmap);
             return winformsBitmap;
+        }
+
+        /// <summary>
+        /// Transforms a grayscale image into a black and white one
+        /// </summary>
+        /// <param name="bitmap">Bitmap needs to be in grayscale!</param>
+        /// <returns></returns>
+        private Bitmap GetBlackAndWhiteBitmap(Bitmap bitmap, out Bitmap original)
+        {
+            Threshold filter = new Threshold(Threshold);
+            original = new Bitmap(bitmap);
+            filter.ApplyInPlace(bitmap);
+            return bitmap;
         }
         
         private void SendFrameToUI(BitmapImage image)
@@ -98,7 +129,9 @@ namespace DrabasVision
         {
             if (CurrentDevice != null)
             {
-                CurrentDevice.Stop();
+                CurrentDevice.SignalToStop();
+                CurrentDevice.WaitForStop();
+                //CurrentDevice.Stop();
                 CurrentDevice.NewFrame -= new NewFrameEventHandler(CameraNewFrameEventHandler);
             }
         }
@@ -120,6 +153,20 @@ namespace DrabasVision
         static private FilterInfoCollection GetDeviceCollection()
         {
             return new FilterInfoCollection(FilterCategory.VideoInputDevice);
+        }
+
+        public static List<string> GetDeviceResolutions(int deviceIndex)
+        {
+            List<string> deviceResolutions = new List<string>();
+            var devices = GetDeviceCollection();
+            var device = new VideoCaptureDevice(devices[deviceIndex].MonikerString);
+            
+            foreach (var deviceVideoCapability in device.VideoCapabilities)
+            {
+                deviceResolutions.Add($"{deviceVideoCapability.FrameSize.Width} x {deviceVideoCapability.FrameSize.Height}");
+            }
+
+            return deviceResolutions;
         }
     }
 }

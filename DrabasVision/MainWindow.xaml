@@ -16,8 +16,11 @@
             <ColumnDefinition Width="19*"/>
         </Grid.ColumnDefinitions>
         <Image Name="imgCameraPreview" Grid.Column="0" Grid.Row="0" Stretch="Fill" Margin="10,10,10,10"/>
-        <ComboBox Name="ddlDevices" HorizontalAlignment="Stretch" Height="25" Margin="10,10,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1"/>
-        <Button Name="btnStart" Content="Start" Grid.Column="1" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Width="129" Height="45" Click="btnStart_Click"/>
-        <Button Name="btnStop" Content="Stop" Grid.Column="1" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top" Width="129" Height="45" Click="btnStop_Click"/>
+        <ComboBox Name="ddlDevices" HorizontalAlignment="Stretch" Height="25" Margin="10,10,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" SelectionChanged="ddlDevices_SelectionChanged"/>
+        <ComboBox Name="ddlDeviceResolutions" HorizontalAlignment="Stretch" Height="25" Margin="10,39,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1"/>
+        <Button Name="btnStart" Content="Start" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,69,10,0" VerticalAlignment="Top"  Height="45" Click="btnStart_Click"/>
+        <Button Name="btnStop" Content="Stop" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,119,10,0" VerticalAlignment="Top"  Height="45" Click="btnStop_Click"/>
+        <Slider Name="sldThreshold" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,181,0,0" VerticalAlignment="Top" Maximum="255" ValueChanged="sldThreshold_ValueChanged"/>
+
     </Grid>
 </Window>
