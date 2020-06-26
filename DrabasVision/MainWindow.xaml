@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DrabasVision"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="695.563">
+        Title="MainWindow" Height="450" Width="695.563" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="345*"/>
@@ -20,7 +20,10 @@
         <ComboBox Name="ddlDeviceResolutions" HorizontalAlignment="Stretch" Height="25" Margin="10,39,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1"/>
         <Button Name="btnStart" Content="Start" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,69,10,0" VerticalAlignment="Top"  Height="45" Click="btnStart_Click"/>
         <Button Name="btnStop" Content="Stop" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,119,10,0" VerticalAlignment="Top"  Height="45" Click="btnStop_Click"/>
-        <Slider Name="sldThreshold" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,181,0,0" VerticalAlignment="Top" Maximum="255" ValueChanged="sldThreshold_ValueChanged"/>
+        <Slider Name="sldThreshold" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,210,0,0" VerticalAlignment="Top" Maximum="255" ValueChanged="sldThreshold_ValueChanged"/>
+        <Label Content="Sensitivity" Grid.Column="1" HorizontalAlignment="Left" Margin="49,192,0,0" VerticalAlignment="Top"/>
+        <Label Content="Min" Grid.Column="1" HorizontalAlignment="Left" Margin="10,228,0,0" VerticalAlignment="Top"/>
+        <Label Content="Max" Grid.Column="1" HorizontalAlignment="Left" Margin="109,228,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

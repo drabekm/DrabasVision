@@ -70,6 +70,8 @@ namespace DrabasVision
             CurrentCamera = new Camera(ddlDevices.SelectedIndex, ddlDeviceResolutions.SelectedIndex, (int)sldThreshold.Value, imgCameraPreview);
             ddlDevices.IsEnabled = false;
             ddlDeviceResolutions.IsEnabled = false;
+            btnStart.IsEnabled = false;
+            btnStop.IsEnabled = true;
             CurrentCamera.Start();
         }
 
@@ -77,6 +79,8 @@ namespace DrabasVision
         {
             CurrentCamera.Stop();
             ddlDevices.IsEnabled = true;
+            btnStart.IsEnabled = true;
+            btnStop.IsEnabled = false;
             ddlDeviceResolutions.IsEnabled = true;
         }
 
@@ -98,6 +102,17 @@ namespace DrabasVision
         private void sldThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             CurrentCamera.SetThreshold((int)sldThreshold.Value);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(CurrentCamera != null)
+            {
+                if(CurrentCamera.IsStarted)
+                {
+                    CurrentCamera.Stop();
+                }
+            }
         }
     }
 }

@@ -16,8 +16,8 @@ namespace DrabasVision
             int width = (int)blackAndWhitewinformsBitmap.Width;
             int height = (int)blackAndWhitewinformsBitmap.Height;
 
-        /*    blackAndWhitewinformsBitmap = BitmapHelper.ConvertToBgra32Format(blackAndWhitewinformsBitmap);
-            grayscaleWinformsBitmap = BitmapHelper.ConvertToBgra32Format(grayscaleWinformsBitmap);*/
+            blackAndWhitewinformsBitmap = BitmapHelper.ConvertToBgra32Format(blackAndWhitewinformsBitmap);
+            grayscaleWinformsBitmap = BitmapHelper.ConvertToBgra32Format(grayscaleWinformsBitmap);
 
             int[,] objectMask = FindObjects(blackAndWhitewinformsBitmap, width, height);
             int[,] separatedObjectsMask = SeparateObjects(objectMask, width, height);

@@ -32,6 +32,7 @@ namespace DrabasVision
         private string CurrentDeviceName { get; set; }
         private Analyzer analyzer;
 
+        public bool IsStarted { get; private set; }
         private int Threshold { get; set; }
 
         System.Windows.Controls.Image outputControl;
@@ -73,6 +74,7 @@ namespace DrabasVision
                 {                  
                     CurrentDevice.NewFrame += new NewFrameEventHandler(CameraNewFrameEventHandler);
                     CurrentDevice.Start();
+                    IsStarted = true;
                 }
                 catch
                 {
@@ -131,6 +133,7 @@ namespace DrabasVision
                 CurrentDevice.SignalToStop();
                 CurrentDevice.WaitForStop();
                 CurrentDevice.NewFrame -= new NewFrameEventHandler(CameraNewFrameEventHandler);
+                IsStarted = false;
             }
         }
 
