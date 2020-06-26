@@ -76,6 +76,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="Analyzer.cs" />
+    <Compile Include="AnalyzerWPF.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

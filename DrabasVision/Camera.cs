@@ -26,8 +26,6 @@ using AForge.Video.DirectShow;
 
 namespace DrabasVision
 {
-    
-
     class Camera
     {
         private VideoCaptureDevice CurrentDevice { get; set; }
@@ -51,10 +49,6 @@ namespace DrabasVision
                 CurrentDeviceName = device.Name;
                 CurrentDevice = new VideoCaptureDevice(device.MonikerString);
                 CurrentDevice.VideoResolution = CurrentDevice.VideoCapabilities[resolutionIndex];
-              /*  foreach(var capability in CurrentDevice.VideoCapabilities)
-                {
-                    MessageBox.Show(capability.FrameSize.Width + " " + capability.FrameSize.Height);
-                }*/
 
                 analyzer = new Analyzer();
             }
@@ -92,10 +86,9 @@ namespace DrabasVision
             var grayScaleWinformsBitmap = GetGrayScaleFrameImage(e);
             var blackAndWhitedWinformsBitmap = GetBlackAndWhiteBitmap(grayScaleWinformsBitmap, out grayScaleWinformsBitmap);
 
-            var test = analyzer.Analyse(blackAndWhitedWinformsBitmap, grayScaleWinformsBitmap);
-            BitmapImage analysedWPFBitmap = BitmapHelper.ConvertWinformBitmapToWPFBitmap(test);
+            var analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(grayScaleWinformsBitmap));
 
-            SendFrameToUI(analysedWPFBitmap);
+            SendFrameToUI(analyzedBitmap);
         }
 
         private Bitmap GetGrayScaleFrameImage(NewFrameEventArgs e)
@@ -125,13 +118,18 @@ namespace DrabasVision
             outputControl.Dispatcher.BeginInvoke(new Action(() => outputControl.Source = image));
         }
 
+        private void SendFrameToUI(WriteableBitmap image)
+        {
+            image.Freeze();
+            outputControl.Dispatcher.BeginInvoke(new Action(() => outputControl.Source = image));
+        }
+
         public void Stop()
         {
             if (CurrentDevice != null)
             {
                 CurrentDevice.SignalToStop();
                 CurrentDevice.WaitForStop();
-                //CurrentDevice.Stop();
                 CurrentDevice.NewFrame -= new NewFrameEventHandler(CameraNewFrameEventHandler);
             }
         }

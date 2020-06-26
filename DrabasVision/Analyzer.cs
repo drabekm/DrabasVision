@@ -1,68 +1,59 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace DrabasVision
 {
     class Analyzer
     {
-        public Analyzer()
+        public WriteableBitmap Analyse(WriteableBitmap blackAndWhitewinformsBitmap, WriteableBitmap grayscaleWinformsBitmap)
         {
+            int width = (int)blackAndWhitewinformsBitmap.Width;
+            int height = (int)blackAndWhitewinformsBitmap.Height;
 
-        }
-
-        public Bitmap Analyse(Bitmap blackAndWhitewinformsBitmap, Bitmap grayscaleWinformsBitmap)
-        {
-            int width = blackAndWhitewinformsBitmap.Width;
-            int height = blackAndWhitewinformsBitmap.Height;
+        /*    blackAndWhitewinformsBitmap = BitmapHelper.ConvertToBgra32Format(blackAndWhitewinformsBitmap);
+            grayscaleWinformsBitmap = BitmapHelper.ConvertToBgra32Format(grayscaleWinformsBitmap);*/
 
             int[,] objectMask = FindObjects(blackAndWhitewinformsBitmap, width, height);
             int[,] separatedObjectsMask = SeparateObjects(objectMask, width, height);
 
-            //Bitmap newWinformsBitmap = new Bitmap(width, height);
             grayscaleWinformsBitmap = ColorObjects(grayscaleWinformsBitmap, separatedObjectsMask, width, height);
-
+            
             return grayscaleWinformsBitmap;
 
         }
 
-        private int[,] FindObjects(Bitmap image, int width, int height)
-        {
-            int[,] objectMask = new int[width, height];
+        private WriteableBitmap ColorObjects(WriteableBitmap image, int[,] separatedObjectsMask, int width, int height)
+        {           
+            Color[] colors = { Colors.Yellow, Colors.Red, Colors.Blue, Colors.Green };
 
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    var pixel = image.GetPixel(x, y);
-                    if (pixel.R + pixel.G + pixel.B == 0)
-                    {
-                        objectMask[x, y] = 1;
-                    }
-                }
-            }
-            return objectMask;
-        }
+            int stride = image.PixelWidth * (image.Format.BitsPerPixel / 8);
+            byte[] data = new byte[stride * image.PixelHeight];
 
-        private Bitmap ColorObjects(Bitmap image, int[,] separatedObjectsMask, int width, int height)
-        {
-            Color[] colors = { Color.Yellow, Color.Red, Color.Blue, Color.Green};
-            
-            
+            image.CopyPixels(data, stride, 0);
+
             for (int x = 0; x < width; x++)
             {
                 for (int y = 0; y < height; y++)
                 {
                     if (separatedObjectsMask[x, y] > 0)
                     {
-                        image.SetPixel(x, y, colors[separatedObjectsMask[x, y] % colors.Length]);
+                        Color currentObjectColor = colors[separatedObjectsMask[x, y] % colors.Length];
+                        int index = (y * stride) + (x * 4);
+                        data[index + 3] = 255;
+                        data[index + 2] = currentObjectColor.R;
+                        data[index + 1] = currentObjectColor.G;
+                        data[index] = currentObjectColor.B;
                     }
                 }
             }
 
+            image.WritePixels(new Int32Rect(0, 0, width, height), data, stride, 0);
             return image;
         }
 
@@ -107,6 +98,28 @@ namespace DrabasVision
             }
 
             return separatedObjectsMask;
+        }
+
+        private int[,] FindObjects(WriteableBitmap image, int width, int height)
+        {
+            int stride = image.PixelWidth * (image.Format.BitsPerPixel / 8);
+            byte[] data = new byte[stride * image.PixelHeight];
+            image.CopyPixels(data, stride, 0);
+            int[,] objectMask = new int[width, height];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    int index = (y * stride) + (x * 4);
+                    if(data[index] == 0)
+                    {
+                        objectMask[x, y] = 1;
+                    }
+
+                }
+            }
+            return objectMask;
         }
     }
 }
