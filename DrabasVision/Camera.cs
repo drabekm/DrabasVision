@@ -26,23 +26,33 @@ using AForge.Video.DirectShow;
 
 namespace DrabasVision
 {
+    public enum OverlayType
+    {
+        BlackAndWhite,
+        Grayscale,
+        Color
+    }
+
     class Camera
     {
         private VideoCaptureDevice CurrentDevice { get; set; }
         private string CurrentDeviceName { get; set; }
         private Analyzer analyzer;
 
+        public OverlayType selectedOverlay;
+
         public bool IsStarted { get; private set; }
         private int Threshold { get; set; }
 
         System.Windows.Controls.Image outputControl;
 
-        public Camera(int cameraIndex, int resolutionIndex, int threshold, System.Windows.Controls.Image outputControl)
+        public Camera(int cameraIndex, int resolutionIndex, int threshold, OverlayType selectedOverlay, System.Windows.Controls.Image outputControl)
         {
             try
             {
                 this.outputControl = outputControl;
                 this.Threshold = threshold;
+                this.selectedOverlay = selectedOverlay;
 
                 FilterInfoCollection devices = GetDeviceCollection();
                 FilterInfo device = devices[cameraIndex];
@@ -85,20 +95,36 @@ namespace DrabasVision
 
         private void CameraNewFrameEventHandler(object sender, NewFrameEventArgs e)
         {
-            var grayScaleWinformsBitmap = GetGrayScaleFrameImage(e);
+            var originalWinformsBitmap = (Bitmap)e.Frame.Clone();
+            var grayScaleWinformsBitmap = GetGrayScaleFrameImage(originalWinformsBitmap);
             var blackAndWhitedWinformsBitmap = GetBlackAndWhiteBitmap(grayScaleWinformsBitmap, out grayScaleWinformsBitmap);
 
-            var analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(grayScaleWinformsBitmap));
+            WriteableBitmap analyzedBitmap;
+            switch (selectedOverlay)
+            {
+                case OverlayType.BlackAndWhite:
+                    analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap));
+                    break;
+                case OverlayType.Grayscale:
+                    analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(grayScaleWinformsBitmap));
+                    break;
+                case OverlayType.Color:
+                    analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(originalWinformsBitmap));
+                    break;
+                default:
+                    analyzedBitmap = analyzer.Analyse(BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(blackAndWhitedWinformsBitmap), BitmapHelper.ConvertWinformBitmapToWPFWriteableBitmap(grayScaleWinformsBitmap));
+                    break;
+            }
+
+            
 
             SendFrameToUI(analyzedBitmap);
         }
 
-        private Bitmap GetGrayScaleFrameImage(NewFrameEventArgs e)
+        private Bitmap GetGrayScaleFrameImage(Bitmap bitmap)
         {
-            Bitmap winformsBitmap = (Bitmap)e.Frame.Clone();
-            
-            winformsBitmap = Grayscale.CommonAlgorithms.BT709.Apply(winformsBitmap);
-            return winformsBitmap;
+            bitmap = Grayscale.CommonAlgorithms.BT709.Apply(bitmap);
+            return bitmap;
         }
 
         /// <summary>

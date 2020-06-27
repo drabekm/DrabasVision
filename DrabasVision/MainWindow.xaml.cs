@@ -67,11 +67,12 @@ namespace DrabasVision
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            CurrentCamera = new Camera(ddlDevices.SelectedIndex, ddlDeviceResolutions.SelectedIndex, (int)sldThreshold.Value, imgCameraPreview);
+            CurrentCamera = new Camera(ddlDevices.SelectedIndex, ddlDeviceResolutions.SelectedIndex, (int)sldThreshold.Value, (OverlayType)ddlBackground.SelectedIndex, imgCameraPreview);
             ddlDevices.IsEnabled = false;
             ddlDeviceResolutions.IsEnabled = false;
             btnStart.IsEnabled = false;
             btnStop.IsEnabled = true;
+            sldThreshold.IsEnabled = true;
             CurrentCamera.Start();
         }
 
@@ -81,6 +82,7 @@ namespace DrabasVision
             ddlDevices.IsEnabled = true;
             btnStart.IsEnabled = true;
             btnStop.IsEnabled = false;
+            sldThreshold.IsEnabled = false;
             ddlDeviceResolutions.IsEnabled = true;
         }
 
@@ -112,6 +114,14 @@ namespace DrabasVision
                 {
                     CurrentCamera.Stop();
                 }
+            }
+        }
+
+        private void ddlBackground_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CurrentCamera != null)
+            {
+                CurrentCamera.selectedOverlay = (OverlayType)ddlBackground.SelectedIndex;
             }
         }
     }

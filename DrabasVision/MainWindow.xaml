@@ -18,12 +18,23 @@
         <Image Name="imgCameraPreview" Grid.Column="0" Grid.Row="0" Stretch="Fill" Margin="10,10,10,10"/>
         <ComboBox Name="ddlDevices" HorizontalAlignment="Stretch" Height="25" Margin="10,10,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1" SelectionChanged="ddlDevices_SelectionChanged"/>
         <ComboBox Name="ddlDeviceResolutions" HorizontalAlignment="Stretch" Height="25" Margin="10,39,10,0" VerticalAlignment="Top" Grid.Row="0" Grid.Column="1"/>
+
         <Button Name="btnStart" Content="Start" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,69,10,0" VerticalAlignment="Top"  Height="45" Click="btnStart_Click"/>
-        <Button Name="btnStop" Content="Stop" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,119,10,0" VerticalAlignment="Top"  Height="45" Click="btnStop_Click"/>
-        <Slider Name="sldThreshold" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,210,0,0" VerticalAlignment="Top" Maximum="255" ValueChanged="sldThreshold_ValueChanged"/>
-        <Label Content="Sensitivity" Grid.Column="1" HorizontalAlignment="Left" Margin="49,192,0,0" VerticalAlignment="Top"/>
+        <Button Name="btnStop" Content="Stop" Grid.Column="1" IsEnabled="False" HorizontalAlignment="Stretch" Margin="10,119,10,0" VerticalAlignment="Top"  Height="45" Click="btnStop_Click"/>
+
+        <Slider Name="sldThreshold" IsEnabled="False" Grid.Column="1" HorizontalAlignment="Stretch" Margin="10,210,0,0" VerticalAlignment="Top" Maximum="255" ValueChanged="sldThreshold_ValueChanged"/>
+
+        <Label Content="Sensitivity" Grid.Column="1" HorizontalAlignment="Center" Margin="0,192,0,0" VerticalAlignment="Top"/>
         <Label Content="Min" Grid.Column="1" HorizontalAlignment="Left" Margin="10,228,0,0" VerticalAlignment="Top"/>
-        <Label Content="Max" Grid.Column="1" HorizontalAlignment="Left" Margin="109,228,0,0" VerticalAlignment="Top"/>
+        <Label Content="Max" Grid.Column="1" HorizontalAlignment="Right" Margin="0,228,10,0" VerticalAlignment="Top"/>
+
+        <Label Content="Background" Grid.Column="1" HorizontalAlignment="Center" Margin="10,260,10,0" VerticalAlignment="Top"/>
+        <ComboBox Name="ddlBackground" Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Center" Margin="10,286,10,0" VerticalAlignment="Top" SelectionChanged="ddlBackground_SelectionChanged" Width="129">
+            <ComboBoxItem Content="None"/>
+            <ComboBoxItem Content="Grayscale"/>
+            <ComboBoxItem Content="Color"/>
+        </ComboBox>
+
 
     </Grid>
 </Window>

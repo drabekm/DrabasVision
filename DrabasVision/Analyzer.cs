@@ -11,20 +11,20 @@ namespace DrabasVision
 {
     class Analyzer
     {
-        public WriteableBitmap Analyse(WriteableBitmap blackAndWhitewinformsBitmap, WriteableBitmap grayscaleWinformsBitmap)
+        public WriteableBitmap Analyse(WriteableBitmap blackAndWhitewinformsBitmap, WriteableBitmap overlayBitmap)
         {
             int width = (int)blackAndWhitewinformsBitmap.Width;
             int height = (int)blackAndWhitewinformsBitmap.Height;
 
             blackAndWhitewinformsBitmap = BitmapHelper.ConvertToBgra32Format(blackAndWhitewinformsBitmap);
-            grayscaleWinformsBitmap = BitmapHelper.ConvertToBgra32Format(grayscaleWinformsBitmap);
+            overlayBitmap = BitmapHelper.ConvertToBgra32Format(overlayBitmap);
 
             int[,] objectMask = FindObjects(blackAndWhitewinformsBitmap, width, height);
             int[,] separatedObjectsMask = SeparateObjects(objectMask, width, height);
 
-            grayscaleWinformsBitmap = ColorObjects(grayscaleWinformsBitmap, separatedObjectsMask, width, height);
+            overlayBitmap = ColorObjects(overlayBitmap, separatedObjectsMask, width, height);
             
-            return grayscaleWinformsBitmap;
+            return overlayBitmap;
 
         }
 
